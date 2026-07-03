@@ -38,7 +38,17 @@ from ..tables.test_case_data import TestCase
 from ..tables.domain import Domain
 
 from bs4 import BeautifulSoup, Comment
-import sys
+
+def compress_html(html_source: str) -> str:
+    """Removes non-interactive markup elements to reduce LLM cost."""
+    soup = BeautifulSoup(html_source, "html.parser")
+    
+    # Strip heavy elements that don't drive interactions
+    for tag in soup(["script", "style", "svg", "path", "noscript", "footer", "header"]):
+        tag.decompose()
+        
+    # Return compressed, compact HTML string
+    return str(soup.prettify())
 
 # Load environment variables
 load_dotenv()

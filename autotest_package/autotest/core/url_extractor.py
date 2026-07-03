@@ -99,15 +99,7 @@ class URLExtractor:
             return []
     
     def extract_links_from_page(self, url):
-        """
-        Extract all links from a single page
-        
-        Args:
-            url (str): URL to extract links from
-            
-        Returns:
-            list: List of href attributes found on the page
-        """
+        """Extract all links from a single page"""
         try:
             self.driver.get(url)
             WebDriverWait(self.driver, 10).until(
@@ -130,16 +122,7 @@ class URLExtractor:
             return []
     
     def is_internal_url(self, url, base_domain):
-        """
-        Check if URL belongs to the same domain
-        
-        Args:
-            url (str): URL to check
-            base_domain (str): Base domain to compare against
-            
-        Returns:
-            bool: True if URL is internal, False otherwise
-        """
+        """Check if URL belongs to the same domain"""
         try:
             parsed_url = urlparse(url)
             return parsed_url.netloc == base_domain
@@ -147,18 +130,17 @@ class URLExtractor:
             return False
     
     def normalize_url(self, url):
-        """
-        Normalize URL by removing fragments and normalizing path
-        
-        Args:
-            url (str): URL to normalize
-            
-        Returns:
-            str: Normalized URL
-        """
+        """Normalize URL by removing fragments and normalizing path"""
         try:
             parsed = urlparse(url)
             path = parsed.path.rstrip('/') or '/'
             return f"{parsed.scheme}://{parsed.netloc}{path}"
         except Exception:
             return url
+
+
+# --- STANDALONE WRAPPER FUNCTION (Placed at the very bottom, outside the class) ---
+def extract_urls(driver, base_url, max_depth=2, logger=None):
+    """Convenience wrapper function to extract URLs without manually initializing the class."""
+    extractor = URLExtractor(driver, logger=logger)
+    return extractor.extract_urls(base_url, max_depth=max_depth)

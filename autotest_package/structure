@@ -1,36 +1,21 @@
-autotest_package/
-├── setup.py
-├── pyproject.toml
-├── README.md
-├── requirements.txt
-├── MANIFEST.in
-├── autotest/
-│   ├── __init__.py
-│   ├── core/
-│   │   ├── __init__.py
-│   │   ├── web_test_generator.py
-│   │   ├── llm_wrapper.py
-│   │   ├── prompt_manager.py
-│   │   └── url_extractor.py
-│   ├── utils/
-│   │   ├── __init__.py
-│   │   └── logging_utils.py
-│   ├── cli/
-│   |   ├── __init__.py
-│   |   └── main.py
-|   ├── db/
-|   |   ├── autotest.db
-|   |   └── database.py
-|   ├── tables/
-|   |   ├── domain.py
-|   |   ├── page.py
-|   |   ├── redirect.py
-|   |   └── test_case_data.py
-|   ├── config/
-│   ├── llm_config.yaml
-│   ├── prompts4.yaml
-│   └── auth_test_data.json
-└── tests/
-    ├── __init__.py
-    ├── test_web_generator.py
-    └── test_llm_wrapper.py
+# autotest/tables/test_case_data.py
+from sqlalchemy import Column, Integer, ForeignKey, Text, String, JSON, DateTime
+from ..db.database import Base
+
+class TestCase(Base):
+    __tablename__ = "test_cases"  # Standardized for Antigravity compatibility
+    
+    id = Column(Integer, primary_key=True, index=True)
+    page_url = Column(String, ForeignKey("page.page_url"))
+    
+    # Antigravity/CSV Mapping
+    step_name = Column(String)            # Maps to "Step"
+    action_description = Column(Text)     # Maps to "Action"
+    verification_criteria = Column(Text)  # Maps to "Verification"
+    status = Column(String, default="pending")
+    
+    # Agent/Automation Fields
+    test_case_type = Column(String)
+    test_case_data = Column(JSON)
+    test_script = Column(Text)
+    script_path = Column(String)
