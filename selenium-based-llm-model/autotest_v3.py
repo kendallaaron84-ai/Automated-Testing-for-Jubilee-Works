@@ -99,36 +99,29 @@ class LLMWrapper:
             self.config = yaml.safe_load(f)
             
         self.provider = self.config["model_provider"]
-        #self.model = self._initialize_model()
         self.models = self._initialize_models()
 
     def _initialize_models(self):
         provider = self.config["model_provider"]
         params = self.config["model_settings"].get(provider, {})
 
-        # Get API key based on provider
-        api_key = os.getenv(
-            "OPENAI_API_KEY" if provider == "openai" else "GROQ_API_KEY"
-        )
-
-        # Correct
-        # ChatOpenAI(api_key=os.getenv("OPENAI_API_KEY"), model=..., temperature=...)
         if provider == "openai":
-            #return ChatOpenAI(**params)
+            api_key = os.getenv("OPENAI_API_KEY")
             return {
-            "analysis": ChatOpenAI(api_key=api_key, model=params["analysis_model"], temperature=params["temperature"], model_kwargs={"response_format": {"type": "json_object"}}),
-            "selenium": ChatOpenAI(api_key=api_key, model=params["selenium_model"], temperature=params["temperature"])
-        }
+                "analysis": ChatOpenAI(api_key=api_key, model=params["analysis_model"], temperature=params["temperature"], model_kwargs={"response_format": {"type": "json_object"}}),
+                "selenium": ChatOpenAI(api_key=api_key, model=params["selenium_model"], temperature=params["temperature"])
+            }
         elif provider == "groq":
+            api_key = os.getenv("GROQ_API_KEY")
             return {
-            "analysis": ChatGroq(api_key=api_key, model=params["analysis_model"], temperature=params["temperature"], model_kwargs={"response_format": {"type": "json_object"}}),
-            "selenium": ChatGroq(api_key=api_key, model=params["selenium_model"], temperature=params["temperature"])
-        }
-        #     return ChatGroq(**params)
+                "analysis": ChatGroq(api_key=api_key, model=params["analysis_model"], temperature=params["temperature"], model_kwargs={"response_format": {"type": "json_object"}}),
+                "selenium": ChatGroq(api_key=api_key, model=params["selenium_model"], temperature=params["temperature"])
+            }
         elif provider == "google-gemini":
+            api_key = os.getenv("GOOGLE_API_KEY")
             return {
-                "analysis": ChatGoogleGenerativeAI(api_key=os.getenv("GOOGLE_API_KEY"), model=params["analysis_model"], temperature=params["temperature"], model_kwargs={"response_format": {"type": "json_object"}}),
-                "selenium": ChatGoogleGenerativeAI(api_key=os.getenv("GOOGLE_API_KEY"), model=params["selenium_model"], temperature=params["temperature"])
+                "analysis": ChatGoogleGenerativeAI(api_key=api_key, model=params["analysis_model"], temperature=params["temperature"], model_kwargs={"response_format": {"type": "json_object"}}),
+                "selenium": ChatGoogleGenerativeAI(api_key=api_key, model=params["selenium_model"], temperature=params["temperature"])
             }
         else:
             raise ValueError(f"Unsupported provider: {provider}")
@@ -138,7 +131,6 @@ class LLMWrapper:
             SystemMessage(content=system_prompt),
             HumanMessage(content=user_prompt)
         ]
-        #return self.model.invoke(messages).content
         return self.models[model_type].invoke(messages).content
 
 class PromptManager:
@@ -615,8 +607,8 @@ class WebTestGenerator:
                 title=page_metadata['title'],
                 forms=json.dumps(page_metadata['forms']),
                 buttons=json.dumps(page_metadata['buttons']),
-                interactive_elements = json.dumps(page_metadata['interactive_elements']),
-                ui_validation_indicators = json.dumps(page_metadata['ui_validation_indicators']),
+                interactive_elements = json.dumps(page_metadata.get('interactive_elements', page_metadata.get('buttons', []))),
+                ui_validation_indicators = json.dumps(page_metadata.get('ui_validation_indicators', [])),
                 url=page_metadata['url'],
                 page_source=page_source
             )
