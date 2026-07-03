@@ -120,8 +120,8 @@ class LLMWrapper:
         elif provider == "google-gemini":
             api_key = os.getenv("GOOGLE_API_KEY")
             return {
-                "analysis": ChatGoogleGenerativeAI(api_key=api_key, model=params["analysis_model"], temperature=params["temperature"], model_kwargs={"response_format": {"type": "json_object"}}),
-                "selenium": ChatGoogleGenerativeAI(api_key=api_key, model=params["selenium_model"], temperature=params["temperature"])
+                "analysis": ChatGoogleGenerativeAI(google_api_key=api_key, model=params["analysis_model"], temperature=params["temperature"], model_kwargs={"response_format": {"type": "json_object"}}),
+                "selenium": ChatGoogleGenerativeAI(google_api_key=api_key, model=params["selenium_model"], temperature=params["temperature"])
             }
         else:
             raise ValueError(f"Unsupported provider: {provider}")
@@ -601,15 +601,21 @@ class WebTestGenerator:
             # )
             user_prompt_template = self.prompt_manager.get_prompt("generate_tests", "user")
             # Format with dynamic values
+           user_prompt_template = self.prompt_manager.get_prompt("generate_tests", "user")
+            
+            # Format with dynamic values using safe dictionary evaluations
+            user_prompt_template = self.prompt_manager.get_prompt("generate_tests", "user")
+            
+            # Format with dynamic values using safe dictionary evaluations
             user_prompt = user_prompt_template.format(
                 page_metadata=json.dumps(page_metadata, indent=2),
                 prompt_suffix=prompt_suffix_new,
-                title=page_metadata['title'],
-                forms=json.dumps(page_metadata['forms']),
-                buttons=json.dumps(page_metadata['buttons']),
-                interactive_elements = json.dumps(page_metadata.get('interactive_elements', page_metadata.get('buttons', []))),
-                ui_validation_indicators = json.dumps(page_metadata.get('ui_validation_indicators', [])),
-                url=page_metadata['url'],
+                title=page_metadata.get('title', 'Untitled Page'),
+                forms=json.dumps(page_metadata.get('forms', [])),
+                buttons=json.dumps(page_metadata.get('buttons', [])),
+                interactive_elements=json.dumps(page_metadata.get('interactive_elements', page_metadata.get('buttons', []))),
+                ui_validation_indicators=json.dumps(page_metadata.get('ui_validation_indicators', [])),
+                url=page_metadata.get('url', ''),
                 page_source=page_source
             )
             result = self.llm.generate(system_prompt, user_prompt, model_type="analysis")

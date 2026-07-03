@@ -1,20 +1,17 @@
-model_provider: "openai"  # Options: openai, groq, anthropic, etc.
+model_provider: "google-gemini"  # Options: openai, groq, google-gemini
+
 model_settings:
   openai:
-    analysis_model: "gpt-4.1-2025-04-14" # For page analysis and test generation
-    selenium_model: "gpt-4.1-2025-04-14" # For script generation
+    analysis_model: "gpt-4.1-2025-04-14"
+    selenium_model: "gpt-4.1-2025-04-14"
     temperature: 0.2
 
-# model_provider: "groq"  # Options: openai, groq, anthropic, etc.
-# model_settings:
-#   groq:
-#     analysis_model: "meta-llama/llama-4-scout-17b-16e-instruct"   # For page analysis and test generation
-#     selenium_model: "meta-llama/llama-4-maverick-17b-128e-instruct"   # For script generation
-#     temperature: 0.2
+  groq:
+    analysis_model: "meta-llama/llama-4-scout-17b-16e-instruct"
+    selenium_model: "meta-llama/llama-4-maverick-17b-128e-instruct"
+    temperature: 0.2
 
-# model_provider: "google-gemini"  # Options: openai, groq, anthropic, etc.
-# model_settings:
-#   google-gemini:
-#     analysis_model: "gemini-2.0-flash" # For page analysis and test generation
-#     selenium_model: "gemini-1.5-pro" # For script generation
-#     temperature: 0.1
+  google-gemini:
+    analysis_model: "gemini-2.5-flash" # High-speed structural HTML page analysis
+    selenium_model: "gemini-2.5-pro"   # Complex reasoning for Selenium script generation
+    temperature: 0.1
